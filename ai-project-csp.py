@@ -3,25 +3,8 @@ import random
 
 
 class Sudoku:
-    def __init__(self, board=None):
-        if board is None:
-            self.board = np.zeros((9, 9), dtype=int)
-            self.generate_valid_board()
-        else:
-            self.board = np.array(board, dtype=int)
-
-    def generate_valid_board(self):
-        #Generate a valid Sudoku board with some pre-filled numbers.
-        for i in range(9):
-            num_list = list(range(1, 10))
-            for j in range(9):
-                if random.random() < 0.3:  # Fill 30% of the cells
-                    while num_list:
-                        num = random.choice(num_list)
-                        if self.is_valid(i, j, num):
-                            self.board[i, j] = num
-                            break
-                        num_list.remove(num)
+    def __init__(self, board):
+        self.board = np.array(board, dtype=int)
 
     def is_valid(self, row, col, num):
         #Check if a number can be placed at a specific position.
@@ -66,15 +49,15 @@ class Sudoku:
 
 
 initial_board = np.array([
-    [5, 3, 0, 0, 7, 0, 0, 0, 0],
-    [6, 0, 0, 1, 9, 5, 0, 0, 0],
-    [0, 9, 8, 0, 0, 0, 0, 6, 0],
-    [8, 0, 0, 0, 6, 0, 0, 0, 3],
-    [4, 0, 0, 8, 0, 3, 0, 0, 1],
-    [7, 0, 0, 0, 2, 0, 0, 0, 6],
-    [0, 6, 0, 0, 0, 0, 2, 8, 0],
-    [0, 0, 0, 4, 1, 9, 0, 0, 5],
-    [0, 0, 0, 0, 8, 0, 0, 7, 9]
+    [0, 2, 0, 0, 0, 0, 0, 0, 7],
+    [1, 0, 8, 4, 9, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 1, 0, 3, 0],
+    [0, 0, 0, 0, 0, 2, 0, 5, 0],
+    [0, 8, 7, 0, 0, 0, 6, 0, 9],
+    [0, 6, 0, 5, 0, 0, 0, 0, 0],
+    [9, 0, 0, 0, 0, 8, 0, 0, 0],
+    [0, 0, 0, 0, 3, 9, 5, 1, 0],
+    [0, 1, 0, 0, 0, 0, 0, 0, 2]
 ])
 
 sudoku_solver = Sudoku(initial_board)
