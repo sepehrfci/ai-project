@@ -2,13 +2,13 @@ import numpy as np
 import random
 from copy import deepcopy
 
-class SudokuSolver:
-    def __init__(self, target, population_size=1000, generations=5000, mutation_rate=0.2):
-        self.target = target
+class Sudoku:
+    def __init__(self, initial_board, population_size=1000, generations=5000, mutation_rate=0.4):
+        self.initial_board = initial_board
         self.population_size = population_size
         self.generations = generations
         self.mutation_rate = mutation_rate
-        self.fixed_positions = self._get_fixed_positions(target)
+        self.fixed_positions = self._get_fixed_positions(initial_board)
         self.population = self._initialize_population()
         print("Initialization complete")
 
@@ -30,7 +30,7 @@ class SudokuSolver:
         return population
 
     def _generate_individual(self):
-        board = np.copy(self.target)
+        board = np.copy(self.initial_board)
         for i in range(9):
             missing_nums = [num for num in range(1, 10) if num not in board[i]]
             random.shuffle(missing_nums)
@@ -67,9 +67,13 @@ class SudokuSolver:
                     child[i][idx1], child[i][idx2] = child[i][idx2], child[i][idx1]
         return child
 
+    def _reset_population(self):
+        self.population = self._initialize_population()
+
     def solve(self):
         best_board = None
         best_fitness = 0
+        generations_without_improvement = 0
 
         for generation in range(self.generations):
             self.population = sorted(self.population, key=self._fitness, reverse=True)
@@ -77,12 +81,23 @@ class SudokuSolver:
             if current_best_fitness > best_fitness:
                 best_fitness = current_best_fitness
                 best_board = self.population[0]
+                generations_without_improvement = 0
+            else:
+                generations_without_improvement += 1
 
             print(f"Generation {generation}: Best fitness = {best_fitness}")
 
             if best_fitness == 243:  # Each row, column, and box should have 9 unique numbers
                 print("Optimal solution found!")
                 break
+
+            if generations_without_improvement >= 100:
+                print(f"No improvement in the last 100 generations. Restarting with a new population.")
+                self._reset_population()
+                best_board = None
+                best_fitness = 0
+                generations_without_improvement = 0
+                continue
 
             next_generation = self.population[:10]
             for _ in range(self.population_size - 10):
@@ -98,7 +113,11 @@ class SudokuSolver:
 
         return best_board, best_fitness
 
-target = np.array([
+    def display(self, solution):
+        for row in solution:
+            print(" ".join(map(str, row)))
+
+initial_board = np.array([
     [5, 3, 0, 0, 7, 0, 0, 0, 0],
     [6, 0, 0, 1, 9, 5, 0, 0, 0],
     [0, 9, 8, 0, 0, 0, 0, 6, 0],
@@ -110,8 +129,8 @@ target = np.array([
     [0, 0, 0, 0, 8, 0, 0, 7, 9]
 ])
 
-solver = SudokuSolver(target)
-solution, solution_fitness = solver.solve()
-print("سودوکوی حل شده:")
-print(solution)
-print("برازش:", solution_fitness)
+sudoku_solver = Sudoku(initial_board)
+solution, solution_fitness = sudoku_solver.solve()
+print("Sudoku solved successfully : ")
+sudoku_solver.display(solution)
+print("Best fitness:", solution_fitness)
